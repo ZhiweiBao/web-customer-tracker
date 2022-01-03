@@ -65,8 +65,10 @@
   <!-- Step 4: Enable configuration of transactional behavior based on annotations -->
   <tx:annotation-driven transaction-manager="myTransactionManager"/>
 
+  <mvc:default-servlet-handler/>
+
   <!-- Add support for reading web resources: css, images, js, etc ... -->
-  <mvc:resources location="/resources/" mapping="/resources/**"/>
+  <mvc:resources location="/static/" mapping="/static/**"/>
 
 </beans>
 
