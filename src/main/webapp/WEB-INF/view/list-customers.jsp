@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ page import="edu.neu.customertracker.util.CustomerFields" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,15 +19,30 @@
                    onclick="window.location.href='showFormForAdd'; return false;"
                    class="add-button"/>
             <!--  add a search box -->
-            <form:form action="search" method="get">
-                Search customer: <input type="text" name="searchName"/>
+            <form:form action="list" method="get">
+                Search customer: <input type="text" name="searchName" value="${searchName}"/>
                 <input type="submit" value="Search" class="add-button"/>
             </form:form>
             <table>
+                <!-- construct a sort link for first name -->
+                <c:url var="sortLinkFirstName" value="/customer/list">
+                    <c:param name="sort" value="<%= CustomerFields.FIRST_NAME.toString() %>"/>
+                    <c:param name="searchName" value="${searchName}"/>
+                </c:url>
+                <!-- construct a sort link for last name -->
+                <c:url var="sortLinkLastName" value="/customer/list">
+                    <c:param name="sort" value="<%= CustomerFields.LAST_NAME.toString() %>"/>
+                    <c:param name="searchName" value="${searchName}"/>
+                </c:url>
+                <!-- construct a sort link for email -->
+                <c:url var="sortLinkEmail" value="/customer/list">
+                    <c:param name="sort" value="<%= CustomerFields.EMAIL.toString() %>"/>
+                    <c:param name="searchName" value="${searchName}"/>
+                </c:url>
                 <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
+                    <th><a href="${sortLinkFirstName}">First Name</a></th>
+                    <th><a href="${sortLinkLastName}">Last Name</a></th>
+                    <th><a href="${sortLinkEmail}">Email</a></th>
                     <th>Action</th>
                 </tr>
                 <c:forEach var="customer" items="${customers}">

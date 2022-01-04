@@ -3,6 +3,7 @@ package edu.neu.customertracker.service.impl;
 import edu.neu.customertracker.dao.CustomerDAO;
 import edu.neu.customertracker.entity.Customer;
 import edu.neu.customertracker.service.CustomerService;
+import edu.neu.customertracker.util.CustomerFields;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,8 @@ public class CustomerServiceImpl implements CustomerService {
 
   @Override
   @Transactional
-  public List<Customer> getCustomers() {
-    return customerDAO.getCustomers();
+  public List<Customer> getCustomers(CustomerFields sortField, String searchName) {
+    return customerDAO.getCustomers(sortField, searchName);
   }
 
   @Override
@@ -36,11 +37,5 @@ public class CustomerServiceImpl implements CustomerService {
   @Transactional
   public void deleteCustomer(int id) {
     customerDAO.deleteCustomer(id);
-  }
-
-  @Override
-  @Transactional
-  public List<Customer> searchCustomers(String searchName) {
-    return customerDAO.searchCustomers(searchName);
   }
 }

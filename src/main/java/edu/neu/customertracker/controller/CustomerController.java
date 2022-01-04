@@ -2,6 +2,7 @@ package edu.neu.customertracker.controller;
 
 import edu.neu.customertracker.entity.Customer;
 import edu.neu.customertracker.service.CustomerService;
+import edu.neu.customertracker.util.CustomerFields;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,9 +21,24 @@ public class CustomerController {
   private CustomerService customerService;
 
   @GetMapping("/list")
-  public String listCustomers(Model model) {
-    // get customers from the dao
-    List<Customer> customers = customerService.getCustomers();
+  public String listCustomers(
+      @RequestParam(required = false) String sort,
+      @RequestParam(value = "searchName", required = false) String searchName,
+      Model model) {
+    // get customers from the service
+    List<Customer> customers;
+
+    // check for sort field
+    if (sort != null) {
+      CustomerFields sortField = Enum.valueOf(CustomerFields.class,sort);
+      customers = customerService.getCustomers(sortField, searchName);
+    } else {
+      // no sort field provided ... default to sorting by last name
+      customers = customerService.getCustomers(CustomerFields.LAST_NAME, searchName);
+    }
+
+    // add searchName to the model
+    model.addAttribute("searchName", searchName);
 
     // add the customers to the model
     model.addAttribute("customers", customers);
@@ -59,17 +75,6 @@ public class CustomerController {
     // delete the customer from the service
     customerService.deleteCustomer(id);
     return "redirect:/customer/list";
-  }
-
-  @GetMapping("/search")
-  public String searchCustomers(@RequestParam("searchName") String searchName,
-      Model model) {
-    // search customers from the service
-    List<Customer> customers = customerService.searchCustomers(searchName);
-
-    // add the customers to the model
-    model.addAttribute("customers", customers);
-    return "list-customers";
   }
 }
 

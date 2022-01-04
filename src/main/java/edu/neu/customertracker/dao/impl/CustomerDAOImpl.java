@@ -2,6 +2,7 @@ package edu.neu.customertracker.dao.impl;
 
 import edu.neu.customertracker.dao.CustomerDAO;
 import edu.neu.customertracker.entity.Customer;
+import edu.neu.customertracker.util.CustomerFields;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -16,13 +17,41 @@ public class CustomerDAOImpl implements CustomerDAO {
   private SessionFactory sessionFactory;
 
   @Override
-  public List<Customer> getCustomers() {
+  public List<Customer> getCustomers(CustomerFields sortField, String searchName) {
     // get the current hibernate session
     Session currentSession = sessionFactory.getCurrentSession();
 
-    // create a query, sort by lastName
-    Query<Customer> query = currentSession.createQuery("from Customer order by lastName",
-        Customer.class);
+    Query<Customer> query;
+
+    // determine sort field
+    String sortFieldName = "lastName";
+
+    switch (sortField) {
+      case FIRST_NAME:
+        sortFieldName = "firstName";
+        break;
+      case LAST_NAME:
+        sortFieldName = "lastName";
+        break;
+      case EMAIL:
+        sortFieldName = "email";
+        break;
+    }
+
+    //
+    // only search by name if theSearchName is not empty
+    //
+    if (searchName != null && searchName.trim().length() > 0) {
+      // search for firstName or lastName ... case insensitive
+      query = currentSession.createQuery(
+          "from Customer where lower(firstName) like :theName or lower(lastName) like :theName order by "
+              + sortFieldName,
+          Customer.class);
+      query.setParameter("theName", "%" + searchName.toLowerCase() + "%");
+    } else {
+      // theSearchName is empty ... so just get all customers
+      query = currentSession.createQuery("from Customer order by " + sortFieldName, Customer.class);
+    }
 
     // get a list of result from the query
     return query.getResultList();
@@ -55,30 +84,5 @@ public class CustomerDAOImpl implements CustomerDAO {
     currentSession.createQuery("delete from Customer where id=:customerId")
         .setParameter("customerId", id)
         .executeUpdate();
-  }
-
-  @Override
-  public List<Customer> searchCustomers(String searchName) {
-    // get the current hibernate session
-    Session currentSession = sessionFactory.getCurrentSession();
-
-    Query<Customer> query;
-
-    //
-    // only search by name if theSearchName is not empty
-    //
-    if (searchName != null && searchName.trim().length() > 0) {
-      // search for firstName or lastName ... case insensitive
-      query = currentSession.createQuery(
-          "from Customer where lower(firstName) like :theName or lower(lastName) like :theName order by lastName",
-          Customer.class);
-      query.setParameter("theName", "%" + searchName.toLowerCase() + "%");
-    } else {
-      // theSearchName is empty ... so just get all customers
-      query = currentSession.createQuery("from Customer order by lastName", Customer.class);
-    }
-
-    // execute query and get result list
-    return query.getResultList();
   }
 }
