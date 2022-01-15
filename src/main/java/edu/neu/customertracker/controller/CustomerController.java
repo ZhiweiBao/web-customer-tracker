@@ -30,7 +30,7 @@ public class CustomerController {
 
     // check for sort field
     if (sort != null) {
-      CustomerFields sortField = Enum.valueOf(CustomerFields.class,sort);
+      CustomerFields sortField = Enum.valueOf(CustomerFields.class, sort);
       customers = customerService.getCustomers(sortField, searchName);
     } else {
       // no sort field provided ... default to sorting by last name
